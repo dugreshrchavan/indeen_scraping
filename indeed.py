@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -6,11 +6,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
-import time 
+import time
 
 app = Flask(__name__)
 
 @app.route("/")
+def home():
+    return redirect("http://127.0.0.1:8000/scrape_indeed/?keyword=")
+
+@app.route("/scrape_indeed/", methods=["GET"])
 def scrape_indeed():
     keyword = request.args.get("keyword")
     location = request.args.get("location", "India")
@@ -96,6 +100,6 @@ def scrape_indeed():
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
+# ✅ Top-level
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
-
