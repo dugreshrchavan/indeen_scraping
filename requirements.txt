@@ -1,0 +1,9 @@
+Flask==2.3.2
+undetected-chromedriver==3.4.7
+beautifulsoup4==4.12.2
+selenium==5.7.2
+
+requests==2.32.0
+
+#pip install -r requirements.txt
+#python indeed.py
