@@ -10,7 +10,7 @@ import time
 
 app = Flask(__name__)
 
-@app.route("/scrape_indeed/", methods=["GET"])
+@app.route("/")
 def scrape_indeed():
     keyword = request.args.get("keyword")
     location = request.args.get("location", "India")
@@ -98,3 +98,4 @@ def scrape_indeed():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+
