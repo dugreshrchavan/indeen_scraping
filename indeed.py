@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return redirect("job_portal_keyword=")
+     return redirect("http://127.0.0.1:8000/scrape_indeed/?keyword=")
 
 @app.route("/scrape_indeed/", methods=["GET"])
 def scrape_indeed():
@@ -103,4 +103,5 @@ def scrape_indeed():
 # ✅ Top-level
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+
 
