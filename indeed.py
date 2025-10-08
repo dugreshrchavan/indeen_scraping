@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
-import undetected_chromedriver as uc
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
+from bs4 import BeautifulSoup
+from webdriver_manager.chrome import ChromeDriverManager
+import time 
 
 app = Flask(__name__)
 
@@ -12,7 +14,7 @@ app = Flask(__name__)
 def scrape_indeed():
     keyword = request.args.get("keyword")
     location = request.args.get("location", "India")
-    pages = int(request.args.get("pages", 1))  # number of pages to scrape (default 1)
+    pages = int(request.args.get("pages", 1))
 
     if not keyword:
         return jsonify({"error": "Please provide a keyword"}), 400
@@ -21,7 +23,7 @@ def scrape_indeed():
         jobs = []
 
         # Setup Chrome
-        options = uc.ChromeOptions()
+        options = webdriver.ChromeOptions()
         options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
@@ -34,14 +36,13 @@ def scrape_indeed():
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )
 
-        driver = uc.Chrome(options=options)
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
         for page in range(pages):
             start = page * 10
             indeed_url = f"https://www.indeed.com/jobs?q={keyword.replace(' ', '+')}&l={location.replace(' ', '+')}&start={start}"
             driver.get(indeed_url)
 
-            # Wait for job cards to load
             WebDriverWait(driver, 15).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.job_seen_beacon"))
             )
@@ -49,7 +50,6 @@ def scrape_indeed():
 
             soup = BeautifulSoup(driver.page_source, "html.parser")
 
-            # Loop through job cards
             for job in soup.select("div.job_seen_beacon"):
                 title_tag = job.select_one("h2.jobTitle span")
                 company_tag = job.select_one("span.companyName")
@@ -95,7 +95,6 @@ def scrape_indeed():
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
